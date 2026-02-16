@@ -1,32 +1,23 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import './globals.css';
+import { Toaster } from 'react-hot-toast';
+import { siteMetadata } from './shared-metadata';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+export const metadata = siteMetadata;
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Organiza",
-  description: "Sistema de organização e lembretes",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-br">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="pt-BR">
+      <body>
+        <Toaster 
+          position="top-right" 
+          toastOptions={{
+            style: {
+              background: 'var(--background)',
+              color: 'var(--foreground)',
+              border: '1px solid rgba(var(--foreground-rgb), 0.1)',
+            },
+          }} 
+        />
         {children}
       </body>
     </html>
