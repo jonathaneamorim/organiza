@@ -1,6 +1,8 @@
+'use client';
 import { useState, useEffect } from 'react';
 import { Task } from '@/types/task';
 import { taskService } from '@/services/taskService';
+import toast from 'react-hot-toast';
 
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -26,10 +28,18 @@ export function useTasks() {
     const updated = [...tasks, newTask];
     setTasks(updated);
     taskService.saveTasks(updated);
+    toast.success('Tarefa adicionada!');
   };
 
   const toggleTask = (id: string) => {
-    const updated = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+    const updated = tasks.map(t => {
+      if (t.id === id) {
+        const isCompleted = !t.completed;
+        if (isCompleted) toast.success('Tarefa concluída! 🎉');
+        return { ...t, completed: isCompleted };
+      }
+      return t;
+    });
     setTasks(updated);
     taskService.saveTasks(updated);
   };
@@ -38,13 +48,28 @@ export function useTasks() {
     const updated = tasks.filter(t => t.id !== id);
     setTasks(updated);
     taskService.saveTasks(updated);
+    toast('Tarefa excluída', { icon: '🗑️' });
   };
 
   const importTasks = async (file: File) => {
-    const imported = await taskService.importBackup(file);
-    setTasks(imported);
-    taskService.saveTasks(imported);
+    try {
+      const imported = await taskService.importBackup(file);
+      setTasks(imported);
+      taskService.saveTasks(imported);
+      toast.success('Backup importado!');
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Erro desconhecido ao importar o arquivo.');
+      }
+    }
   };
 
-  return { tasks, isLoaded, addTask, toggleTask, deleteTask, importTasks };
+  const exportTasks = () => {
+    taskService.exportBackup(tasks);
+    toast.success('Backup exportado!');
+  };
+
+  return { tasks, isLoaded, addTask, toggleTask, deleteTask, importTasks, exportTasks };
 }
