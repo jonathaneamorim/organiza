@@ -1,4 +1,5 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Organiza
+Aplicativo desenvolvido para organizar e centralizar tarefas e objetivos do dia/semana/ano
 
 ## Getting Started
 
