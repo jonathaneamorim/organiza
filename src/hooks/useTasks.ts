@@ -17,6 +17,10 @@ export function useTasks() {
   }, []);
 
   const addTask = (title: string, date: string) => {
+    if (!title.trim()) {
+      toast.error('A tarefa precisa de um título!');
+      return;
+    }
     const newTask: Task = {
       id: crypto.randomUUID(),
       title,
@@ -66,10 +70,29 @@ export function useTasks() {
     }
   };
 
+  
+  const updateTask = (id: string, updates: { title?: string; date?: string }) => {
+    setTasks(prev => {
+      const updated = prev.map(t => t.id === id ? { ...t, ...updates } : t);
+      taskService.saveTasks(updated);
+      return updated;
+    });
+    toast.success('Tarefa atualizada!');
+  };
+
   const exportTasks = () => {
     taskService.exportBackup(tasks);
     toast.success('Backup exportado!');
   };
 
-  return { tasks, isLoaded, addTask, toggleTask, deleteTask, importTasks, exportTasks };
+  return { 
+    tasks, 
+    isLoaded, 
+    addTask, 
+    toggleTask, 
+    deleteTask, 
+    importTasks, 
+    exportTasks, 
+    updateTask 
+  };
 }
