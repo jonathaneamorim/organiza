@@ -2,11 +2,14 @@
 import { useState } from 'react';
 import { useTasks } from '@/hooks/useTasks';
 import Link from 'next/link';
+import EditModal from '@/components/EditModal';
+import { Task } from '@/types/task';
 
 export default function Home() {
-  const { tasks, isLoaded, toggleTask, deleteTask, addTask, importTasks, exportTasks } = useTasks();
+  const { tasks, isLoaded, toggleTask, deleteTask, addTask, importTasks, exportTasks, updateTask } = useTasks();
   const [newTitle, setNewTitle] = useState('');
   const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   if (!isLoaded) return null;
 
@@ -67,7 +70,7 @@ export default function Home() {
             </div>
 
             <nav className="flex flex-col gap-3">
-              <Link href="/datas" className="group flex items-center justify-between p-5 border border-[var(--foreground)]/10 rounded-2xl shadow-sm bg-[var(--background)] hover:border-indigo-500/50 transition-all">
+              <Link href="/calendar" className="group flex items-center justify-between p-5 border border-[var(--foreground)]/10 rounded-2xl shadow-sm bg-[var(--background)] hover:border-indigo-500/50 transition-all">
                 <div className="flex items-center gap-3">
                   <div className="bg-indigo-500/10 p-2 rounded-lg text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
                     📅
@@ -133,6 +136,14 @@ export default function Home() {
                         </span>
                       </div>
                     </label>
+
+                    <button 
+                      onClick={() => setEditingTask({ ...task })}
+                      className="ml-4 p-2 text-xs font-bold uppercase tracking-wider text-indigo-500/80 hover:text-indigo-500 hover:bg-indigo-500/10 rounded-lg transition-all"
+                    >
+                      Editar
+                    </button>
+
                     <button 
                       onClick={() => deleteTask(task.id)}
                       className="ml-4 p-2 text-xs font-bold uppercase tracking-wider text-red-500/80 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
@@ -153,6 +164,21 @@ export default function Home() {
 
         </div>
       </main>
+      
+      {editingTask && (
+        <EditModal 
+          key={editingTask.id} 
+          isOpen={true}
+          initialTitle={editingTask.title}
+          initialDate={editingTask.date}
+          onClose={() => setEditingTask(null)}
+          onSave={(newTitle, newDate) => {
+            updateTask(editingTask.id, { title: newTitle, date: newDate });
+            setEditingTask(null);
+          }}
+        />
+      )}
+
     </div>
   );
 }
